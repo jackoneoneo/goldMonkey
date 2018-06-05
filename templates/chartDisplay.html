@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<HTML>
+
+	<HEAD>
+		<TITLE>电芯分析图</TITLE>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+	</HEAD>
+	<BODY>
+		<nav class="navbar navbar-default" style="margin-bottom: 0;">
+			<a class="navbar-brand"><img src="img/logo.png" /></a>
+			<div class="container-fluid">
+				<div class="navbar-header">
+				</div>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav navbar-right">
+						<select class="selectpicker" id="selectPicker">
+
+                        </select>
+						<select class="selectBum" id="selectBum" style="width:100px">
+
+                        </select>
+						<button id="submitInfo">查询</button>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="content" style="margin-top: 0;" >
+					<iframe src="{{url_for('static',filename='/html/example.html')}}" style="width: 100%;height: 600px;" id="concreteInfo">
+					</iframe>
+		</div>
+	</body>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script>
+		  $(function(){
+		     $.get("/databaseName",function(data,status){
+		    varHtml = "<option>    </option>";
+		    data =  JSON.parse(data);
+		       $.each(data,function(index,element){
+		          varHtml += "<option>"+element+"</option>";
+		       })
+		       $("#selectPicker").html(varHtml);
+		     });
+
+         $("#selectPicker").change(function() {
+		         var selectText = $("#selectPicker").find("option:selected").text();
+		         var url = "/bmulist/"+selectText;
+		         $.get(url,function(data,status){
+		         varHtml = "<option>    </option>";
+		         data =  JSON.parse(data);
+		         $.each(data,function(index,element){
+		            varHtml += "<option>"+element+"</option>";
+		         })
+		         $("#selectBum").html(varHtml);
+		           /*$('#concreteInfo').attr('src',"html/"+data);*/
+		         })
+		     })
+
+		     $("#submitInfo").click(function(){
+		           var selectBCText = $("#selectPicker").find("option:selected").text();
+		           var selectBmuText = $("#selectBum").find("option:selected").text();
+		           console.log(selectBCText +"    "+selectBmuText)
+		           if((selectBCText.trim() !="") &&(selectBmuText.trim() != "")){
+		              var url = "/bmuChart/"+selectBCText+"/"+selectBmuText;
+		              $.get(url,function(data,status){
+		                 $('#concreteInfo').attr('src',"html/"+data);
+		              })
+		           }else if((selectBCText.trim() !="") &&(selectBmuText.trim() == "")){
+		               var url = "/dataChart/"+selectBCText;
+		              $.get(url,function(data,status){
+		                 $('#concreteInfo').attr('src',"html/"+data);
+		              })
+		           }else{
+		             //TODO
+		           }
+		     })
+
+
+		  })
+	</script>
+	</div>
+	</BODY>
+
+</HTML>
